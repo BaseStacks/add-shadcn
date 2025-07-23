@@ -1,0 +1,41 @@
+{
+  "name": "fast-shadcn",
+  "version": "1.0.0",
+  "description": "A fast and convenient CLI tool to install shadcn/ui components",
+  "main": "dist/index.js",
+  "bin": {
+    "fast-shadcn": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "shadcn",
+    "ui",
+    "components",
+    "cli",
+    "react",
+    "tailwind"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "chalk": "^4.1.2",
+    "ora": "^5.4.1",
+    "execa": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/inquirer": "^9.0.3",
+    "typescript": "^5.2.2",
+    "tsx": "^3.14.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
