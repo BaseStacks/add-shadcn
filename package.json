@@ -1,10 +1,10 @@
 {
-  "name": "fast-shadcn",
+  "name": "add-shadcn",
   "version": "1.0.0",
   "description": "A fast and convenient CLI tool to install shadcn/ui components",
   "main": "dist/index.js",
   "bin": {
-    "fast-shadcn": "./dist/index.js"
+    "add-shadcn": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^20.8.0",
     "@types/inquirer": "^9.0.3",
+    "@inquirer/prompts": "^7.7.1",
     "typescript": "^5.2.2",
     "tsx": "^3.14.0"
   },

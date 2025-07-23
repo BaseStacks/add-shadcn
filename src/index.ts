@@ -3,148 +3,166 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import ora from 'ora';
 import execa from 'execa';
-import * as path from 'path';
-import * as fs from 'fs';
-import { SHADCN_COMPONENTS, ShadcnComponent } from './components';
+import path from 'path';
+import fs from 'fs';
+import { select } from '@inquirer/prompts';
+import { libraries, RegistryItemType } from './libraries';
+import { installItem } from './installer';
 
 const program = new Command();
 
-interface GlobalOptions {
-  projectDir?: string;
+interface Options {
+  lib: string;
+  // Shadcn specific options
+  yes: boolean;
+  overwrite: boolean;
+  cwd: string;
+  all: boolean;
+  path: string;
+  silent: boolean;
+  srcDir: false;
+  noSrcDir: boolean;
+  cssVariables: boolean;
+  noCssVariables: boolean;
 }
 
-async function validateProjectDirectory(projectDir: string): Promise<void> {
-  const packageJsonPath = path.join(projectDir, 'package.json');
-  const componentsConfigPath = path.join(projectDir, 'components.json');
-  
-  if (!fs.existsSync(packageJsonPath)) {
-    console.log(chalk.yellow(`⚠️  No package.json found in ${projectDir}`));
-    console.log(chalk.yellow('This might not be a valid Node.js project.'));
-  }
-  
-  if (!fs.existsSync(componentsConfigPath)) {
-    console.log(chalk.yellow(`⚠️  No components.json found in ${projectDir}`));
-    console.log(chalk.yellow('Shadcn/ui might not be initialized in this project.'));
-    console.log(chalk.cyan('Run "npx shadcn@latest init" to initialize shadcn/ui first.'));
-  }
-}
 
-async function installComponent(componentName: string, projectDir?: string) {
-  const spinner = ora(`Installing ${componentName} component...`).start();
-  
-  try {
-    // Stop spinner to avoid interference with shadcn output
-    spinner.stop();
-    
-    const workingDir = projectDir || process.cwd();
-    console.log(chalk.cyan(`Installing ${componentName} in ${workingDir}...`));
-    
-    await validateProjectDirectory(workingDir);
-    
-    await execa('npx', ['shadcn@latest', 'add', componentName], {
-      stdio: 'inherit',
-      cwd: workingDir
-    });
-    
-    console.log(chalk.green(`✅ ${componentName} component installed successfully!`));
-  } catch (error) {
-    console.log(chalk.red(`❌ Failed to install ${componentName} component`));
-    console.error(error);
+async function selectLibrary() {
+  const choices = Object.entries(libraries).map(([name, registry]) => ({
+    name: registry.name,
+    description: registry.description,
+    value: name,
+  }));
+
+  const answer = await select({
+    message: 'Select a registry:',
+    choices
+  });
+
+  if (!answer) {
+    console.log(chalk.red('No registry selected'));
     process.exit(1);
   }
+  const selectedRegistry = libraries[answer];
+  return selectedRegistry;
 }
 
-async function selectAndInstallComponents(options: GlobalOptions) {
-  console.log(chalk.blue.bold('\n🚀 Fast ShadCN Component Installer\n'));
-  
-  let projectDir = options.projectDir;
- 
-  const { selectedComponents } = await inquirer.prompt([
+
+async function selectComponents(items: RegistryItemType[]) {
+  const { selected } = await inquirer.prompt([
     {
       type: 'checkbox',
-      name: 'selectedComponents',
-      message: 'Select components to install:',
-      choices: SHADCN_COMPONENTS.map((component: ShadcnComponent) => ({
-        name: `${component.name} - ${component.description}`,
-        value: component.command,
-        short: component.name
-      })),
+      name: 'selected',
+      message: 'Select components:',
+      choices: items.map((component: RegistryItemType) => {
+        const title = typeof component === 'string' ? component.split('/').pop() : component.title;
+        const value = typeof component === 'string' ? component : component.items;
+
+        return {
+          name: title,
+          value: value
+        };
+      }),
       pageSize: 15
     }
   ]);
 
-  if (selectedComponents.length === 0) {
-    console.log(chalk.yellow('No components selected. Exiting...'));
+  if (selected.length === 0) {
     return;
   }
 
-  console.log(chalk.cyan(`\nInstalling ${selectedComponents.length} component(s)...\n`));
-
-  for (const component of selectedComponents) {
-    await installComponent(component, projectDir);
-  }
-
-  console.log(chalk.green.bold('\n🎉 All selected components installed successfully!'));
+  return selected.reduce((acc: string[], item: RegistryItemType) => {
+    if (typeof item === 'string') {
+      acc.push(item);
+    } else if (Array.isArray(item)) {
+      acc.push(...item);
+    }
+    return acc;
+  }, [] as string[]);
 }
 
-async function installSpecificComponent(componentName: string, options: GlobalOptions) {
-  const component = SHADCN_COMPONENTS.find((c: ShadcnComponent) => 
-    c.command === componentName || c.name.toLowerCase() === componentName.toLowerCase()
-  );
+function needToInitialize(cwd: string): boolean {
+  const configPath = path.join(cwd, 'components.json');
+  return !fs.existsSync(configPath);
+}
 
-  if (!component) {
-    console.error(chalk.red(`❌ Component "${componentName}" not found.`));
-    console.log(chalk.yellow('\nAvailable components:'));
-    SHADCN_COMPONENTS.forEach((c: ShadcnComponent) => {
-      console.log(chalk.gray(`  • ${c.name} (${c.command})`));
-    });
-    process.exit(1);
-  }
-
-  let projectDir = options.projectDir;
-  
-  await installComponent(component.command, projectDir);
+async function initProject(cwd: string) {
+  await execa('npx', ['shadcn@latest', 'init'], {
+    stdio: 'inherit',
+    cwd: cwd
+  });
 }
 
 program
-  .name('fast-shadcn')
+  .name('shadcn-add [components]')
   .description('A fast and convenient CLI tool to install shadcn/ui components')
   .version('1.0.0')
-  .option('-p, --project-dir <path>', 'specify the project directory');
+  // Global options
+  .option('-l, --lib <name>', 'Specify the ui library to use', 'shadcn')
+  // Shadcn specific options
+  .option('-y, --yes', 'Skip confirmation prompts', false)
+  .option('-o, --overwrite', 'overwrite existing files', false)
+  .option('-c, --cwd <path>', 'the working directory. defaults to the current directory', process.cwd())
+  .option('-a, --all', 'add all available components', false)
+  .option('-p, --path <path>', 'the path to add the component to', '')
+  .option('-s, --silent', 'mute output', false)
+  .option('--src-dir <path>', 'use the src directory when creating a new project', false)
+  .option('--css-variables', 'use css variables for theming', false)
+  .option('--no-css-variables', 'do not use css variables for theming')
+  .action(async (options: Options) => {
+    const library = options.lib ? libraries[options.lib] : await selectLibrary();
+    if (!library) {
+      console.log(chalk.red('Invalid library selected'));
+      process.exit(1);
+    }
 
-program
-  .command('install [component]')
-  .alias('i')
-  .description('Install a specific component or show selection menu')
-  .action(async (component?: string) => {
-    const options = program.opts() as GlobalOptions;
-    
-    if (component) {
-      await installSpecificComponent(component, options);
-    } else {
-      await selectAndInstallComponents(options);
+    const availableItems = library.registry.components || [];
+
+    const components = await selectComponents(availableItems);
+
+    if (!components || components.length === 0) {
+      console.log(chalk.red('No components selected'));
+      process.exit(1);
+    }
+
+    if (availableItems.length === 0) {
+      console.log(chalk.red('No components available from the registry.'));
+      process.exit(1);
+    }
+
+    const needToInit = needToInitialize(options.cwd);
+    if (needToInit) {
+      console.log(chalk.yellow('No components.json found. Initializing...'));
+      await initProject(options.cwd);
+    }
+
+    if (!components) {
+      console.log(chalk.yellow('No components selected'));
+      return;
+    }
+
+    for (const component of components) {
+      await installItem(component, options.cwd);
     }
   });
 
-program
-  .command('list')
-  .alias('ls')
-  .description('List all available components')
-  .action(() => {
-    console.log(chalk.blue.bold('\n📦 Available ShadCN Components:\n'));
-    SHADCN_COMPONENTS.forEach((component: ShadcnComponent) => {
-      console.log(chalk.green(`• ${component.name}`));
-      console.log(chalk.gray(`  Command: ${component.command}`));
-      console.log(chalk.gray(`  Description: ${component.description}\n`));
-    });
-  });
+program.command('get [type]')
+  .action(async (type) => {
+    if (type === 'libs') {
+      for (const [key, lib] of Object.entries(libraries)) {
+        let message = `- ${chalk.green(lib.name)}: `;
+        if (lib.description) {
+          message += `${chalk.gray(lib.description)} `;
+        }
+        message += `(${chalk.blue(lib.url)})`;
+        console.log(message);
+      }
 
-// Default action when no command is provided
-program.action(async () => {
-  const options = program.opts() as GlobalOptions;
-  await selectAndInstallComponents(options);
-});
+      return;
+    }
+
+    throw new Error(`Unknown type: ${type}`);
+  })
 
 program.parse();
