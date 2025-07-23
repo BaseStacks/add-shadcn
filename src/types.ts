@@ -1,6 +1,17 @@
-
-import shadcn from './ui-libs/shadcn';
-import diceUi from './ui-libs/dice-ui';
+export interface AddOptions {
+    lib: string;
+    // Shadcn specific options
+    yes: boolean;
+    overwrite: boolean;
+    cwd: string;
+    all: boolean;
+    path: string;
+    silent: boolean;
+    srcDir: false;
+    noSrcDir: boolean;
+    cssVariables: boolean;
+    noCssVariables: boolean;
+}
 
 export interface RegistryItem {
     title: string;
@@ -17,12 +28,5 @@ export interface LibraryRegistry {
     registry: {
         main?: string;
         components?: (string | RegistryItemType)[];
-    },
-    getItems?: () => Promise<RegistryItemType[]>;
+    }
 }
-
-export const libraries: Record<string, LibraryRegistry> = {
-    shadcn: shadcn,
-    "dice-ui": diceUi,
-}
-

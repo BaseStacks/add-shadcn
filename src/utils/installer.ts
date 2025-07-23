@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { LibraryRegistry, RegistryItemType } from './libraries';
 import chalk from 'chalk';
 import execa from 'execa';
 import path from 'path';
+import { AddOptions } from '../types';
 
 const getExecutor = () => {
     const lockFiles = {
@@ -32,21 +32,35 @@ const getExecutor = () => {
     }
 }
 
-export async function installItem(item: string, workingDir: string) {
+export async function installItem(item: string, options: AddOptions) {
     try {
         const executor = getExecutor();
         const version = 'latest';
-        const args = [`shadcn@${version}`, 'add', item];
+        const args = [`shadcn@${version}`, 'add'];
 
-        console.log(chalk.blue(`${executor[0]} ${args.join(' ')}`));
+        if (options.all) args.push('--all');
+        if (options.yes) args.push('--yes');
+        if (options.overwrite) args.push('--overwrite');
+        if (options.cwd) args.push(`--cwd=${options.cwd}`);
+        if (options.path) args.push(`--path=${options.path}`);
+        if (options.silent) args.push('--silent');
+        if (options.srcDir) args.push('--src-dir');
+        if (options.noCssVariables) args.push('--no-css-variables');
+        if (options.cssVariables) args.push('--css-variables');
+        if (options.noCssVariables) args.push('--no-css-variables');
+
+        if(item) {
+            args.push(item);
+        }
 
         if (executor[1]) {
             args.unshift(executor[1]);
         }
 
+        console.log(chalk.blue(`${executor[0]} ${args.join(' ')}`));
+
         await execa(executor[0], args, {
-            stdio: 'inherit',
-            cwd: workingDir
+            stdio: 'inherit'
         });
 
     } catch (error) {
