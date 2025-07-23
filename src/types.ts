@@ -14,8 +14,10 @@ export interface AddOptions {
 }
 
 export interface RegistryItem {
-    title: string;
-    items: string[];
+    label: string;
+    description?: string;
+    value: string;
+    page: string;
 }
 
 export type RegistryItemType = RegistryItem | string;
@@ -24,6 +26,7 @@ export interface LibraryRegistry {
     isDefault?: boolean;
     name: string;
     description?: string;
+    tags?: string[];
     url?: string;
     registry: {
         main?: string;

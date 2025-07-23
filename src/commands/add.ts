@@ -36,11 +36,11 @@ async function selectComponents(items: RegistryItemType[]): Promise<string[] | u
             name: 'selected',
             message: 'Select components:',
             choices: items.map((component: RegistryItemType) => {
-                const title = typeof component === 'string' ? component.split('/').pop() : component.title;
-                const value = typeof component === 'string' ? component : component.items;
+                const label = typeof component === 'string' ? component.split('/').pop() : component.label;
+                const value = typeof component === 'string' ? component : component.value;
 
                 return {
-                    name: title,
+                    name: label,
                     value: value
                 };
             }),
@@ -52,26 +52,7 @@ async function selectComponents(items: RegistryItemType[]): Promise<string[] | u
         return;
     }
 
-    return selected.reduce((acc: string[], item: RegistryItemType) => {
-        if (typeof item === 'string') {
-            acc.push(item);
-        } else if (Array.isArray(item)) {
-            acc.push(...item);
-        }
-        return acc;
-    }, [] as string[]);
-}
-
-function needToInitialize(cwd: string): boolean {
-    const configPath = path.join(cwd, 'components.json');
-    return !fs.existsSync(configPath);
-}
-
-async function initProject(cwd: string) {
-    await execa('npx', ['shadcn@latest', 'init'], {
-        stdio: 'inherit',
-        cwd: cwd
-    });
+    return selected;
 }
 
 export const add = new Command('add')

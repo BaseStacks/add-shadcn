@@ -24,18 +24,19 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "commander": "^11.1.0",
-    "inquirer": "^9.2.12",
     "chalk": "^4.1.2",
-    "ora": "^5.4.1",
-    "execa": "^5.1.1"
+    "commander": "^11.1.0",
+    "execa": "^5.1.1",
+    "inquirer": "^9.2.12",
+    "ora": "^5.4.1"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
-    "@types/inquirer": "^9.0.3",
     "@inquirer/prompts": "^7.7.1",
-    "typescript": "^5.2.2",
-    "tsx": "^3.14.0"
+    "@types/inquirer": "^9.0.3",
+    "@types/node": "^20.8.0",
+    "console-table-printer": "^2.14.6",
+    "tsx": "^3.14.0",
+    "typescript": "^5.2.2"
   },
   "engines": {
     "node": ">=16.0.0"

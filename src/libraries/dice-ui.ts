@@ -1,7 +1,7 @@
 export default {
     name: 'dice-ui',
-    description: 'A collection of composable, unstyled UI primitives for building accessible web applications.',
     url: 'https://www.diceui.com',
+    tags: ['ui-kit'],
     registry: {
         components: [
             "https://diceui.com/r/checkbox-group",
