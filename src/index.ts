@@ -103,7 +103,7 @@ program
   // Shadcn specific options
   .option('-y, --yes', 'Skip confirmation prompts', false)
   .option('-o, --overwrite', 'overwrite existing files', false)
-  .option('-c, --cwd <path>', 'the working directory. defaults to the current directory', process.cwd())
+  .option('-c, --cwd <path>', 'the working directory. defaults to the current directory', (value) => !value ? process.cwd() : path.resolve(process.cwd(), value))
   .option('-a, --all', 'add all available components', false)
   .option('-p, --path <path>', 'the path to add the component to', '')
   .option('-s, --silent', 'mute output', false)
