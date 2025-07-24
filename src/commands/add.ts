@@ -36,12 +36,9 @@ async function selectComponents(items: RegistryItemType[]): Promise<string[] | u
             name: 'selected',
             message: 'Select components:',
             choices: items.map((component: RegistryItemType) => {
-                const label = typeof component === 'string' ? component.split('/').pop() : component.label;
-                const value = typeof component === 'string' ? component : component.value;
-
                 return {
-                    name: label,
-                    value: value
+                    name: component.name,
+                    value: component.registry
                 };
             }),
             pageSize: 15

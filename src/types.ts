@@ -14,13 +14,13 @@ export interface AddOptions {
 }
 
 export interface RegistryItem {
-    label: string;
-    description?: string;
-    value: string;
+    name: string;
+    registry: string;
     page: string;
+    tags?: string[];
 }
 
-export type RegistryItemType = RegistryItem | string;
+export type RegistryItemType = RegistryItem;
 
 export interface LibraryRegistry {
     isDefault?: boolean;
@@ -28,8 +28,9 @@ export interface LibraryRegistry {
     description?: string;
     tags?: string[];
     url?: string;
+    repository?: string;
     registry: {
         main?: string;
-        components?: (string | RegistryItemType)[];
+        components?: RegistryItemType[];
     }
 }
