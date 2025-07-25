@@ -1,14 +1,12 @@
 {
   "name": "add-shadcn",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This tool provides a fast and convenient way to install shadcn/ui components and other UI libraries.",
-  "main": "dist/index.js",
-  "bin": {
-    "add-shadcn": "./dist/index.js"
-  },
+  "type": "module",
+  "bin": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "tsup",
+    "build:watch": "tsup --watch",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -30,18 +28,19 @@
     "package.json"
   ],
   "dependencies": {
+    "@inquirer/prompts": "^7.7.1",
     "chalk": "^4.1.2",
     "commander": "^11.1.0",
     "execa": "^5.1.1",
     "inquirer": "^9.2.12",
-    "ora": "^5.4.1"
+    "ora": "^5.4.1",
+    "console-table-printer": "^2.14.6"
   },
   "devDependencies": {
-    "@inquirer/prompts": "^7.7.1",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^20.8.0",
-    "console-table-printer": "^2.14.6",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "tsup": "^8.5.0"
   },
   "engines": {
     "node": ">=16.0.0"
