@@ -1,6 +1,6 @@
 {
   "name": "add-shadcn",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This tool provides a fast and convenient way to install shadcn/ui components and other UI libraries.",
   "type": "module",
   "bin": "./dist/index.js",
