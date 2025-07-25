@@ -1,6 +1,5 @@
 export interface AddOptions {
     lib: string;
-    component?: string[];
     // Shadcn specific options
     yes: boolean;
     overwrite: boolean;
