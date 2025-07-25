@@ -1,5 +1,6 @@
 export interface AddOptions {
     lib: string;
+    component?: string[];
     // Shadcn specific options
     yes: boolean;
     overwrite: boolean;
@@ -15,6 +16,7 @@ export interface AddOptions {
 
 export interface RegistryItem {
     name: string;
+    description?: string;
     registry: string;
     page: string;
     tags?: string[];
