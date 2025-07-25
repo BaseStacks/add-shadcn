@@ -5,8 +5,6 @@ This tool provides a fast and convenient way to install shadcn/ui components and
 ## Features
 - Interactive CLI with component selection
 - Support for multiple UI libraries
-- Component browsing and filtering
-- Flexible installation options
 
 ## Installation and Usage
 

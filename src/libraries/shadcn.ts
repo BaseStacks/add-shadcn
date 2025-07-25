@@ -77,11 +77,6 @@ export default {
                 "page": "https://ui.shadcn.com/docs/components/collapsible"
             },
             {
-                "name": "combobox",
-                "registry": "combobox",
-                "page": "https://ui.shadcn.com/docs/components/combobox"
-            },
-            {
                 "name": "command",
                 "registry": "command",
                 "page": "https://ui.shadcn.com/docs/components/command"
@@ -235,11 +230,6 @@ export default {
                 "name": "textarea",
                 "registry": "textarea",
                 "page": "https://ui.shadcn.com/docs/components/textarea"
-            },
-            {
-                "name": "toast",
-                "registry": "toast",
-                "page": "https://ui.shadcn.com/docs/components/toast"
             },
             {
                 "name": "toggle",
